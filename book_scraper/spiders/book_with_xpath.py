@@ -1,7 +1,7 @@
 import scrapy # import this module to use scrapy.Spider for creating spiders
 # import this module to use HtmlResponse class for response argument in parse method
 from scrapy.http.response.html import HtmlResponse
-
+from ..items import BookScraperItem
 class BookWithXPathSpider(scrapy.Spider):
     # name of the spider so that we can run it from the terminal 
     # by using `scrapy crawl book`
@@ -40,10 +40,11 @@ class BookWithXPathSpider(scrapy.Spider):
             else:
                 in_stock = False
             
-            yield {
-                'image_path_url': image_path_url,
-                'price': price,
-                'title': title,
-                'in_stock': in_stock,
-                'rating': rating,
-            }
+            new_book = BookScraperItem()
+            new_book['image_path_url'] = image_path_url
+            new_book['price'] = price
+            new_book['title'] = title
+            new_book['in_stock'] = in_stock
+            new_book['rating'] = rating
+
+            yield new_book
