@@ -2,9 +2,7 @@ import scrapy # import this module to use scrapy.Spider for creating spiders
 # import this module to use HtmlResponse class for response argument in parse method
 from scrapy.http.response.html import HtmlResponse
 from ..items import BookScraperItem
-
-def get_price(txt):
-    return float(txt.replace('£', ''))
+from scrapy.loader import ItemLoader
 
 class BookWithXPathSpider(scrapy.Spider):
     # name of the spider so that we can run it from the terminal 
@@ -28,10 +26,8 @@ class BookWithXPathSpider(scrapy.Spider):
         '''
         
         book_card_html = response.xpath('//article[@class="product_pod"]')
-        print('[BOOK_CARD_HTML]')
-        print(book_card_html)
+
         for book_card in book_card_html:
-            # https://books.toscrape.com/media/cache/2c/da/2cdad67c44b002e7ead0cc35693c0e8b.jpg
             image_path_raw = book_card.xpath('//img/@src').get()
             image_path_url = 'https://books.toscrape.com/' + str(image_path_raw)
             price = book_card.xpath('//p[@class="price_color"]/text()').get()
@@ -43,12 +39,13 @@ class BookWithXPathSpider(scrapy.Spider):
                 in_stock = True
             else:
                 in_stock = False
-            
-            new_book = BookScraperItem()
-            new_book['image_path_url'] = image_path_url
-            new_book['price'] = get_price(price)
-            new_book['title'] = title
-            new_book['in_stock'] = in_stock
-            new_book['rating'] = rating
 
-            yield new_book
+            loader = ItemLoader(item=BookScraperItem(), selector=book_card)
+
+            loader.add_value('image_path_url', image_path_url)
+            loader.add_value('price', price)
+            loader.add_value('title', title)
+            loader.add_value('in_stock', in_stock)
+            loader.add_value('rating', rating)
+
+            yield loader.load_item()
