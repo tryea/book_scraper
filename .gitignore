@@ -2,3 +2,4 @@
 /book_scraper/spiders/__pycache__
 books.json
 bookwithobject.json
+books.xlsx

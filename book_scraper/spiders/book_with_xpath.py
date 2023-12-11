@@ -13,6 +13,9 @@ class BookWithXPathSpider(scrapy.Spider):
     # for the spider to begin crawling from.
     start_urls = ['http://books.toscrape.com/']
 
+    # cols use for column created when create the excel file
+    cols = ['Image Path', 'Price', 'Title', 'In Stock', 'Rating']
+    # parse method is in charge of processing the response and
     def parse(self, response: HtmlResponse): 
         '''
         The parse method is in charge of processing the response and
@@ -28,12 +31,12 @@ class BookWithXPathSpider(scrapy.Spider):
         book_card_html = response.xpath('//article[@class="product_pod"]')
 
         for book_card in book_card_html:
-            image_path_raw = book_card.xpath('//img/@src').get()
+            image_path_raw = book_card.xpath('.//img/@src').get()
             image_path_url = 'https://books.toscrape.com/' + str(image_path_raw)
-            price = book_card.xpath('//p[@class="price_color"]/text()').get()
-            title = book_card.xpath('//h3/a/@title').get()
-            in_stock = book_card.xpath('//p[@class="instock availability"]').get()
-            rating_raw = book_card.xpath('//p[contains(@class, "star-rating")]/@class').get()
+            price = book_card.xpath('.//p[@class="price_color"]/text()').get()
+            title = book_card.xpath('.//h3/a/@title').get()
+            in_stock = book_card.xpath('.//p[@class="instock availability"]').get()
+            rating_raw = book_card.xpath('.//p[contains(@class, "star-rating")]/@class').get()
             rating = rating_raw.split(' ')[1]
             if in_stock:
                 in_stock = True
